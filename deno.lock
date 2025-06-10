@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "npm:@tensorflow/tfjs@^4.22.0": "4.22.0_@tensorflow+tfjs-core@4.22.0",
+    "npm:cropperjs@2": "2.0.0",
     "npm:solid-js@^1.9.5": "1.9.7_seroval@1.3.2",
     "npm:vite-plugin-solid@^2.11.6": "2.11.6_solid-js@1.9.7__seroval@1.3.2_vite@6.3.5__picomatch@4.0.2_@babel+core@7.27.4",
     "npm:vite@6.3.5": "6.3.5_picomatch@4.0.2",
@@ -147,6 +148,93 @@
         "@babel/helper-string-parser",
         "@babel/helper-validator-identifier"
       ]
+    },
+    "@cropper/element-canvas@2.0.0": {
+      "integrity": "sha512-GPtGJgSm92crJhhhwUsaMw3rz2KfJWWSz7kRAlufFEV/EHTP5+6r6/Z1BCGRna830i+Avqbm435XLOtA7PVJwA==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-crosshair@2.0.0": {
+      "integrity": "sha512-KfPfyrdeFvUC31Ws7ATtcalWWSaMtrC6bMoCipZhqbUOE7wZoL4ecDSL6BUOZxPa74awZUqfzirCDjHvheBfyw==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-grid@2.0.0": {
+      "integrity": "sha512-i78SQ0IJTLFveKX6P7svkfMYVdgHrQ8ZmmEw8keFy9n1ZVbK+SK0UHK5FNMRNI/gtVhKJOGEnK/zeyjUdj4Iyw==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-handle@2.0.0": {
+      "integrity": "sha512-ZJvW+0MkK9E8xYymGdoruaQn2kwjSHFpNSWinjyq6csuVQiCPxlX5ovAEDldmZ9MWePPtWEi3vLKQOo2Yb0T8g==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-image@2.0.0": {
+      "integrity": "sha512-9BxiTS/aHRmrjopaFQb9mQQXmx4ruhYHGkDZMVz24AXpMFjUY6OpqrWse/WjzD9tfhMFvEdu17b3VAekcAgpeg==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/element-canvas",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-selection@2.0.0": {
+      "integrity": "sha512-ensNnbIfJsJ8bhbJTH/RXtk2URFvTOO4TvfRk461n2FPEC588D7rwBmUJxQg74IiTi4y1JbCI+6j+4LyzYBLCQ==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/element-canvas",
+        "@cropper/element-image",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-shade@2.0.0": {
+      "integrity": "sha512-jv/2bbNZnhU4W+T4G0c8ADocLIZvQFTXgCf2RFDNhI5UVxurzWBnDdb8Mx8LnVplnkTqO+xUmHZYve0CwgWo+Q==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/element-canvas",
+        "@cropper/element-selection",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element-viewer@2.0.0": {
+      "integrity": "sha512-zY+3VRN5TvpM8twlphYtXw0tzJL2VgzeK7ufhL1BixVqOdRxwP13TprYIhqwGt9EW/SyJZUiaIu396T89kRX8A==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/element-canvas",
+        "@cropper/element-image",
+        "@cropper/element-selection",
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/element@2.0.0": {
+      "integrity": "sha512-lsthn0nQq73GExUE7Mg/ss6Q3RXADGDv055hxoLFwvl/wGHgy6ZkYlfLZ/VmgBHC6jDK5IgPBFnqrPqlXWSGBA==",
+      "dependencies": [
+        "@cropper/utils"
+      ]
+    },
+    "@cropper/elements@2.0.0": {
+      "integrity": "sha512-PQkPo1nUjxLFUQuHYu+6atfHxpX9B41Xribao6wpvmvmNIFML6LQdNqqWYb6LyM7ujsu71CZdBiMT5oetjJVoQ==",
+      "dependencies": [
+        "@cropper/element",
+        "@cropper/element-canvas",
+        "@cropper/element-crosshair",
+        "@cropper/element-grid",
+        "@cropper/element-handle",
+        "@cropper/element-image",
+        "@cropper/element-selection",
+        "@cropper/element-shade",
+        "@cropper/element-viewer"
+      ]
+    },
+    "@cropper/utils@2.0.0": {
+      "integrity": "sha512-cprLYr+7kK3faGgoOsTW9gIn5sefDr2KwOmgyjzIXk+8PLpW8FgFKEg5FoWfRD5zMAmkCBuX6rGKDK3VdUEGrg=="
     },
     "@esbuild/aix-ppc64@0.25.5": {
       "integrity": "sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==",
@@ -620,6 +708,13 @@
       "integrity": "sha512-+jwgnhg6cQxKYIIjGtAHq2nwUOolo9eoFZ4sHfUH09BLXBgxnH4gA0zEd+t+BO2cNB8idaBtZFcFTRjQJRJmAw==",
       "scripts": true
     },
+    "cropperjs@2.0.0": {
+      "integrity": "sha512-TO2j0Qre01kPHbow4FuTrbdEB4jTmGRySxW49jyEIqlJZuEBfrvCTT0vC3eRB2WBXudDfKi1Onako6DKWKxeAQ==",
+      "dependencies": [
+        "@cropper/elements",
+        "@cropper/utils"
+      ]
+    },
     "csstype@3.1.3": {
       "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="
     },
@@ -1075,6 +1170,7 @@
   "workspace": {
     "dependencies": [
       "npm:@tensorflow/tfjs@^4.22.0",
+      "npm:cropperjs@2",
       "npm:solid-js@^1.9.5",
       "npm:vite-plugin-solid@^2.11.6",
       "npm:vite@^6.3.5"

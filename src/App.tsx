@@ -2,7 +2,8 @@ import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import Model from "./model/Model.ts";
 import styles from "./App.module.css";
-import { image } from "@tensorflow/tfjs";
+import Cropperjs from "cropperjs";
+import Cropper from "./components/Cropper.tsx";
 
 interface CloudName {
   genera: string | undefined;
@@ -16,6 +17,7 @@ function App() {
   });
 
   const [file, setFile] = createSignal<File>();
+  const [cropping, setCropping] = createSignal(false);
   const image = createMemo(() => (file() == null ? null : URL.createObjectURL(file()!)));
   const [cloudName, setCloudName] = createStore<CloudName>({
     genera: "altocumulus",
@@ -31,6 +33,7 @@ function App() {
     if (newFile == file() || newFile == null) return;
 
     if (image()) URL.revokeObjectURL(image()!);
+
     setFile(newFile);
   }
 
@@ -45,7 +48,15 @@ function App() {
           <form action="#" class={styles.form}>
             <label for="cloud" class={styles.form__select}>
               <Show when={image()}>
-                <img src={image() || ""} alt={file()?.name} class={styles.form__img} />
+                {(src) => (
+                  <>
+                    <img src={image() || ""} alt={file()?.name} class={styles.form__img} />
+
+                    {/* <Show when={cropping()}> */}
+                    <Cropper src={src} />
+                    {/* </Show> */}
+                  </>
+                )}
               </Show>
               Select image
               <input

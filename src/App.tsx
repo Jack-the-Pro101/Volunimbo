@@ -7,7 +7,7 @@ import { CNN_INPUT_SIZE } from "./constants.ts";
 import { Tensor } from "@tensorflow/tfjs";
 import AboutSection from "./components/AboutSection.tsx";
 import Footer from "./components/Footer.tsx";
-import { getMostProbable, getNameFromIndex } from "../utils.ts";
+import { getMostProbable, getNameFromIndex, getProbabilitiesPastThreshold } from "../utils.ts";
 import { GeneraCloudType } from "./model/ModelTypes.ts";
 
 interface CloudName {
@@ -88,7 +88,13 @@ function App() {
       }
       if (varietiesResult instanceof Tensor) {
         const data = await varietiesResult.data();
-        console.log(data);
+
+        const varieties = getProbabilitiesPastThreshold(data, 0.75);
+
+        setCloudName(
+          "varieties",
+          varieties.map((variety) => getNameFromIndex(ModelType.VARIETIES, variety.index))
+        );
       }
     } catch (error) {
       alert(`Failed to predict ${error}`);

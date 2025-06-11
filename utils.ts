@@ -33,7 +33,7 @@ export function getMostProbable(
 
 export function getProbabilitiesPastThreshold(
   data: Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>,
-  thresholdProbability: number
+  thresholdProbability = 0.75
 ) {
   const array = Array.from(data);
 

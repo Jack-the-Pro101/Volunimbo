@@ -20,7 +20,7 @@
 .container {
   display: flex;
   width: 100%;
-  max-width: 1600px;
+  max-width: 1400px;
   margin: auto;
   padding: 1em;
   gap: 1em;
@@ -92,27 +92,6 @@
 
 .app__detailPanel h3 {
   font-weight: 500;
-}
-
-.about {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1em;
-  padding-block: 1em;
-}
-.about h2 {
-  text-align: center;
-}
-.about p {
-  max-width: 70ch;
-  margin: auto;
-  color: var(--clr-neutral-2);
-}
-.about ul {
-  list-style-type: square;
-  margin: auto;
-  color: var(--clr-neutral-2);
 }
 
 footer {

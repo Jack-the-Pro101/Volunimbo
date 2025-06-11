@@ -1,82 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 import { Accessor, createSignal, Setter } from "solid-js";
 
-export enum PrimaryCloudType {
-  Ac,
-  As,
-  Cb,
-  Cc,
-  Ci,
-  Cs,
-  Ct,
-  Cu,
-  Ns,
-  Sc,
-  St,
-  Clear,
-}
-
-export enum SpeciesCloudType {
-  Calvus,
-  Capillatus,
-  Castellanus,
-  Congestus,
-  Fibratus,
-  Floccus,
-  Fractus,
-  Humilis,
-  Lenticularis,
-  Mediocris,
-  Nebulosus,
-  Spissatus,
-  Stratiformis,
-  Uncinus,
-  Volutus,
-}
-
-export enum VarietyCloudType {
-  Arcus,
-  Asperitas,
-  Cavum,
-  Duplicatus,
-  Flammagenitus,
-  Fluctus,
-  Homogenitus,
-  Incus,
-  Intortus,
-  Lacunosus,
-  Mamma,
-  Nacreous,
-  Noctilucent,
-  Opacus,
-  Pannus,
-  Perlucidus,
-  Pileus,
-  Praecipitatio,
-  Radiatus,
-  Translucidus,
-  Tuba,
-  Undulatus,
-  Velum,
-  Vertebratus,
-  Virga,
-}
-
-export const PrimaryCloudMap: Record<PrimaryCloudType, string> = {
-  [PrimaryCloudType.Ac]: "Altocumulus",
-  [PrimaryCloudType.As]: "Altostratus",
-  [PrimaryCloudType.Cb]: "Cumulonimbus",
-  [PrimaryCloudType.Cc]: "Cirrocumulus",
-  [PrimaryCloudType.Ci]: "Cirrus",
-  [PrimaryCloudType.Cs]: "Cirrostratus",
-  [PrimaryCloudType.Ct]: "Contrail",
-  [PrimaryCloudType.Cu]: "Cumulus",
-  [PrimaryCloudType.Ns]: "Nimbostratus",
-  [PrimaryCloudType.Sc]: "Stratocumulus",
-  [PrimaryCloudType.St]: "Stratus",
-  [PrimaryCloudType.Clear]: "Clear",
-} as const;
-
 export enum ModelType {
   GENERA, // 10 cloud genera
   SPECIES, // 15 cloud species
@@ -110,9 +34,12 @@ class Model {
   async imageToTensor(image: HTMLImageElement) {
     const tensor = await tf.browser.fromPixelsAsync(image, 3);
 
+    // Normalization tensors the models were trained on
     const mean = tf.tensor1d([0.5333, 0.53, 0.5399]);
     const std = tf.tensor1d([0.23, 0.2306, 0.2221]);
 
+    // Normalize pixel data from 0-255 to 0-1, then normalize based on above,
+    // then add in 1 more dimension at beginning representing batch size of 1
     return tensor.div(255).sub(mean).div(std).expandDims(0);
   }
 
@@ -121,7 +48,7 @@ class Model {
 
     switch (model) {
       case ModelType.GENERA:
-        return this.generaModel!.execute(data);
+        return await this.generaModel!.executeAsync(data);
       case ModelType.SPECIES:
         return await this.speciesModel!.executeAsync(data);
       case ModelType.VARIETIES:

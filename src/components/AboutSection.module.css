@@ -1,0 +1,20 @@
+.about {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1em;
+  padding-block: 1em;
+}
+.about h2 {
+  text-align: center;
+}
+.about p {
+  max-width: 70ch;
+  margin: auto;
+  color: var(--clr-neutral-2);
+}
+.about ul {
+  list-style-type: square;
+  margin: auto;
+  color: var(--clr-neutral-2);
+}

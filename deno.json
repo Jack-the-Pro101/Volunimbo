@@ -7,7 +7,7 @@
   "nodeModulesDir": "auto",
   "imports": {
     "@tensorflow/tfjs": "npm:@tensorflow/tfjs@^4.22.0",
-    "cropperjs": "npm:cropperjs@^2.0.0",
+    "cropperjs": "npm:cropperjs@1.6.2",
     "solid-js": "npm:solid-js@^1.9.5",
     "vite": "npm:vite@^6.3.5",
     "vite-plugin-solid": "npm:vite-plugin-solid@^2.11.6"

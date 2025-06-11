@@ -7,13 +7,59 @@ export enum PrimaryCloudType {
   Cb,
   Cc,
   Ci,
-  Clear,
   Cs,
   Ct,
   Cu,
   Ns,
   Sc,
   St,
+  Clear,
+}
+
+export enum SpeciesCloudType {
+  Calvus,
+  Capillatus,
+  Castellanus,
+  Congestus,
+  Fibratus,
+  Floccus,
+  Fractus,
+  Humilis,
+  Lenticularis,
+  Mediocris,
+  Nebulosus,
+  Spissatus,
+  Stratiformis,
+  Uncinus,
+  Volutus,
+}
+
+export enum VarietyCloudType {
+  Arcus,
+  Asperitas,
+  Cavum,
+  Duplicatus,
+  Flammagenitus,
+  Fluctus,
+  Homogenitus,
+  Incus,
+  Intortus,
+  Lacunosus,
+  Mamma,
+  Nacreous,
+  Noctilucent,
+  Opacus,
+  Pannus,
+  Perlucidus,
+  Pileus,
+  Praecipitatio,
+  Radiatus,
+  Translucidus,
+  Tuba,
+  Undulatus,
+  Velum,
+  Vertebratus,
+  Virga,
 }
 
 export const PrimaryCloudMap: Record<PrimaryCloudType, string> = {
@@ -22,13 +68,13 @@ export const PrimaryCloudMap: Record<PrimaryCloudType, string> = {
   [PrimaryCloudType.Cb]: "Cumulonimbus",
   [PrimaryCloudType.Cc]: "Cirrocumulus",
   [PrimaryCloudType.Ci]: "Cirrus",
-  [PrimaryCloudType.Clear]: "Clear",
   [PrimaryCloudType.Cs]: "Cirrostratus",
   [PrimaryCloudType.Ct]: "Contrail",
   [PrimaryCloudType.Cu]: "Cumulus",
   [PrimaryCloudType.Ns]: "Nimbostratus",
   [PrimaryCloudType.Sc]: "Stratocumulus",
   [PrimaryCloudType.St]: "Stratus",
+  [PrimaryCloudType.Clear]: "Clear",
 } as const;
 
 export enum ModelType {
@@ -61,8 +107,13 @@ class Model {
     console.log("Model initialized");
   }
 
-  static async imageToTensor(image: HTMLImageElement) {
-    return await tf.browser.fromPixelsAsync(image);
+  async imageToTensor(image: HTMLImageElement) {
+    const tensor = await tf.browser.fromPixelsAsync(image, 3);
+
+    const mean = tf.tensor1d([0.5333, 0.53, 0.5399]);
+    const std = tf.tensor1d([0.23, 0.2306, 0.2221]);
+
+    return tensor.div(255).sub(mean).div(std).expandDims(0);
   }
 
   async predict(model: ModelType, data: tf.Tensor) {
@@ -70,11 +121,11 @@ class Model {
 
     switch (model) {
       case ModelType.GENERA:
-        return await this.generaModel!.predictAsync(data);
+        return this.generaModel!.execute(data);
       case ModelType.SPECIES:
-        return await this.speciesModel!.predictAsync(data);
+        return await this.speciesModel!.executeAsync(data);
       case ModelType.VARIETIES:
-        return await this.varietiesModel!.predictAsync(data);
+        return await this.varietiesModel!.executeAsync(data);
     }
   }
 }

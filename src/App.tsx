@@ -1,44 +1,89 @@
-import { createMemo, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import Model from "./model/Model.ts";
+import Model, { ModelType } from "./model/Model.ts";
 import styles from "./App.module.css";
-import Cropperjs from "cropperjs";
 import Cropper from "./components/Cropper.tsx";
+import { CNN_INPUT_SIZE } from "./constants.ts";
+import { Tensor } from "@tensorflow/tfjs";
 
 interface CloudName {
   genera: string | undefined;
   species: string | undefined | null;
-  varieties: string[] | undefined | null;
+  varieties: string[] | undefined;
 }
 
 function App() {
   onMount(async () => {
-    // await Model.init();
+    await Model.init();
   });
 
   const [file, setFile] = createSignal<File>();
+  const ogImage = createMemo<string | null>((value) => {
+    if (value) URL.revokeObjectURL(value);
+    return file() == null ? null : URL.createObjectURL(file()!);
+  });
   const [cropping, setCropping] = createSignal(false);
-  const image = createMemo(() => (file() == null ? null : URL.createObjectURL(file()!)));
+  const [image, setImage] = createSignal<string>();
   const [cloudName, setCloudName] = createStore<CloudName>({
-    genera: "altocumulus",
-    species: "stratiformis",
-    varieties: ["cavum", "udulatus"],
+    genera: undefined,
+    species: undefined,
+    varieties: undefined,
   });
 
   let input!: HTMLInputElement;
+  let imageElem!: HTMLImageElement;
 
-  async function imageChanged() {
+  function imageChanged() {
     const newFile = input.files?.item(0)!;
 
     if (newFile == file() || newFile == null) return;
 
-    if (image()) URL.revokeObjectURL(image()!);
-
     setFile(newFile);
+    setCropping(true);
   }
+
+  createEffect(async () => {
+    const imageSrc = image();
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    if (imageSrc == null) return;
+
+    console.log(await Model.imageToTensor(imageElem).then((t) => t.data()));
+    const result = await Model.predict(ModelType.GENERA, await Model.imageToTensor(imageElem));
+
+    if (result instanceof Tensor) {
+      const data = await result.data();
+      console.log(data);
+    }
+  });
 
   return (
     <>
+      <Show when={ogImage()}>
+        {(src) => (
+          <Show when={cropping()}>
+            <Cropper
+              src={src}
+              callbacks={{
+                cancel() {
+                  setCropping(false);
+                },
+                done(blob) {
+                  setCropping(false);
+
+                  if (!blob) return;
+
+                  setImage((image) => {
+                    if (image) URL.revokeObjectURL(image);
+                    return URL.createObjectURL(blob);
+                  });
+                },
+              }}
+            />
+          </Show>
+        )}
+      </Show>
       <header class={styles.header}>
         <h1>Volunimbo</h1>
         <p>AI cloud type classifier</p>
@@ -47,17 +92,15 @@ function App() {
         <section class={styles.container}>
           <form action="#" class={styles.form}>
             <label for="cloud" class={styles.form__select}>
-              <Show when={image()}>
-                {(src) => (
-                  <>
-                    <img src={image() || ""} alt={file()?.name} class={styles.form__img} />
-
-                    {/* <Show when={cropping()}> */}
-                    <Cropper src={src} />
-                    {/* </Show> */}
-                  </>
-                )}
-              </Show>
+              <img src={image() || ""} alt={file()?.name} class={styles.form__img} />
+              <img
+                src={image() || ""}
+                alt={file()?.name}
+                hidden
+                width={CNN_INPUT_SIZE}
+                height={CNN_INPUT_SIZE}
+                ref={imageElem}
+              />
               Select image
               <input
                 type="file"

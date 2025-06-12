@@ -9,11 +9,39 @@
 }
 
 .list {
+  --line-height: 1.25rem;
+
   margin-left: none;
   margin-top: 0.5em;
+  height: calc(var(--line-height) * 3);
+  overflow: hidden;
+  interpolate-size: allow-keywords;
+  transition: height 0.2s ease;
+}
+
+.list.visible {
+  height: auto;
+  height: calc-size(auto);
+}
+
+.showLabelBtn {
+  display: block;
+  cursor: pointer;
+  color: var(--clr-primary-5);
+  text-align: center;
+}
+
+.showLabelBtn:hover,
+.showLabelBtn:focus {
+  text-decoration: underline;
+}
+
+.panel input {
+  display: none;
 }
 
 .list li {
   display: flex;
   justify-content: space-between;
+  line-height: var(--line-heightd);
 }

@@ -1,20 +1,20 @@
-import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
-import { createStore } from "solid-js/store";
-import Model, { ModelType } from "./model/Model.ts";
-import styles from "./App.module.css";
-import Cropper from "./components/Cropper.tsx";
-import { CNN_INPUT_SIZE } from "./constants.ts";
 import { Tensor } from "@tensorflow/tfjs";
-import AboutSection from "./components/AboutSection.tsx";
-import Footer from "./components/Footer.tsx";
-import { getMostProbable, getNameFromIndex, getProbabilitiesPastThreshold } from "../utils.ts";
-import { GeneraCloudType } from "./model/ModelTypes.ts";
+import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createStore } from "solid-js/store";
 
-interface CloudName {
-  genera: string | undefined;
-  species: string | undefined | null;
-  varieties: string[] | undefined;
-}
+import { CloudClassification } from "../types.d.ts";
+import { compileResults, getNameFromIndex } from "../utils.ts";
+
+import styles from "./App.module.css";
+
+import AboutSection from "./components/AboutSection.tsx";
+import CloudDetailPanel from "./components/CloudDetailPanel.tsx";
+import Cropper from "./components/Cropper.tsx";
+import Footer from "./components/Footer.tsx";
+import { CNN_INPUT_SIZE } from "./constants.ts";
+import Model, { ModelType } from "./model/Model.ts";
+import { GeneraCloudType } from "./model/ModelTypes.ts";
+import Loader from "./components/Loader.tsx";
 
 function App() {
   let input!: HTMLInputElement;
@@ -28,10 +28,10 @@ function App() {
   const [cropping, setCropping] = createSignal(false);
   const [image, setImage] = createSignal<string>();
   const [imageLoaded, setImageLoaded] = createSignal(false);
-  const [cloudName, setCloudName] = createStore<CloudName>({
-    genera: undefined,
-    species: undefined,
-    varieties: undefined,
+  const [cloud, setCloud] = createStore<CloudClassification>({
+    genera: { name: undefined, probabilities: [] },
+    species: { name: undefined, probabilities: [] },
+    varieties: { name: undefined, probabilities: [] },
   });
 
   onMount(async () => {
@@ -47,6 +47,8 @@ function App() {
 
     setFile(newFile);
     setCropping(true);
+
+    input.value = "";
   }
 
   function updateImageLoaded() {
@@ -55,7 +57,6 @@ function App() {
 
   createEffect(async () => {
     const imageSrc = image();
-
     if (imageSrc == null || !imageLoaded()) return;
 
     try {
@@ -69,32 +70,46 @@ function App() {
 
       if (generaResult instanceof Tensor) {
         const data = await generaResult.data();
-        const result = getMostProbable(data);
-        setCloudName("genera", getNameFromIndex(ModelType.GENERA, result.index));
-        console.log(result);
+        const results = compileResults(ModelType.GENERA, data);
+
+        setCloud("genera", "name", results[0].name);
+        setCloud("genera", "probabilities", results);
 
         if (
-          (result.index as GeneraCloudType) == GeneraCloudType.Clear ||
-          (result.index as GeneraCloudType) == GeneraCloudType.Ct
+          (results[0].index as GeneraCloudType) == GeneraCloudType.Clear ||
+          (results[0].index as GeneraCloudType) == GeneraCloudType.Ct
         )
           // Clear sky and contrail clouds do not have additional features, done classifying
           return;
+      } else {
+        setCloud("genera", "name", undefined);
       }
 
       if (speciesResult instanceof Tensor) {
         const data = await speciesResult.data();
-        const result = getMostProbable(data);
-        setCloudName("species", getNameFromIndex(ModelType.SPECIES, result.index));
+        const results = compileResults(ModelType.SPECIES, data);
+
+        setCloud("species", "name", results[0].name);
+        setCloud("species", "probabilities", results);
+      } else {
+        setCloud("species", "name", undefined);
       }
+
       if (varietiesResult instanceof Tensor) {
         const data = await varietiesResult.data();
+        const results = compileResults(ModelType.VARIETIES, data);
 
-        const varieties = getProbabilitiesPastThreshold(data, 0.75);
-
-        setCloudName(
+        setCloud(
           "varieties",
-          varieties.map((variety) => getNameFromIndex(ModelType.VARIETIES, variety.index))
+          "name",
+          results
+            .filter((result) => result.probability >= 0.75)
+            .map((result) => getNameFromIndex(ModelType.VARIETIES, result.index))
+            .join(" ")
         );
+        setCloud("varieties", "probabilities", results);
+      } else {
+        setCloud("varieties", "name", undefined);
       }
     } catch (error) {
       alert(`Failed to predict ${error}`);
@@ -156,39 +171,40 @@ function App() {
                 name="cloud"
                 id="cloud"
                 accept="image/*"
-                onInput={imageChanged}
+                onChange={imageChanged}
                 ref={input}
                 required
               />
             </label>
           </form>
           <div class={styles.app}>
+            <Show when={!Model.ready()}>
+              <Loader />
+            </Show>
             <h2 class={styles.app__cloudName}>
-              {cloudName.genera} {cloudName.species} {cloudName.varieties?.map((value) => value)?.join(" ")}
+              <Show
+                when={cloud.genera.name}
+                fallback={
+                  <For each={[30, 20, 40]}>
+                    {(number) => (
+                      <span class={styles.app__cloudNameSkeleton} style={{ "--width": `${number}%` }}>
+                        {" "}
+                      </span>
+                    )}
+                  </For>
+                }
+              >
+                {cloud.genera.name} {cloud.species.name} {cloud.varieties.name}
+              </Show>
             </h2>
 
             <p></p>
 
-            <div class={styles.app__details}>
-              <div class={styles.app__detailPanel}>
-                <h3>Genera</h3>
-                <p>{cloudName.genera}</p>
-
-                <ol></ol>
-              </div>
-              <div class={styles.app__detailPanel}>
-                <h3>Species</h3>
-                <p>{cloudName.species}</p>
-
-                <ol></ol>
-              </div>
-              <div class={styles.app__detailPanel}>
-                <h3>Supplementary features / Varieties</h3>
-                <p></p>
-
-                <ol></ol>
-              </div>
-            </div>
+            <ol class={styles.app__details}>
+              <CloudDetailPanel cloud={cloud.genera} type="Genera" />
+              <CloudDetailPanel cloud={cloud.species} type="Species" />
+              <CloudDetailPanel cloud={cloud.varieties} type="Supplementary features / Varieties" />
+            </ol>
           </div>
         </section>
         <AboutSection />

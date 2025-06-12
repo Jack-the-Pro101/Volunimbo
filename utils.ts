@@ -1,4 +1,3 @@
-import { resourceLimits } from "node:worker_threads";
 import { ModelType } from "./src/model/Model.ts";
 import {
   CloudType,
@@ -10,9 +9,15 @@ import {
   VarietyCloudType,
 } from "./src/model/ModelTypes.ts";
 
-export function getMostProbable(
-  data: Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>
-) {
+type TensorflowData = Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>;
+
+export function compileResults(type: ModelType, data: TensorflowData) {
+  return Array.from(data)
+    .map((value, i) => ({ index: i, name: getNameFromIndex(type, i), probability: value }))
+    .sort((a, b) => b.probability - a.probability);
+}
+
+export function getMostProbable(data: TensorflowData) {
   const array = Array.from(data);
 
   const max = {
@@ -31,31 +36,6 @@ export function getMostProbable(
   return max;
 }
 
-export function getProbabilitiesPastThreshold(
-  data: Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>,
-  thresholdProbability = 0.75
-) {
-  const array = Array.from(data);
-
-  const results: {
-    index: number;
-    probability: number;
-  }[] = [];
-
-  for (let i = 0; i < array.length; i++) {
-    const element = array[i];
-
-    if (element >= thresholdProbability) {
-      results.push({
-        index: i,
-        probability: element,
-      });
-    }
-  }
-
-  return results;
-}
-
 export function getNameFromIndex<T extends CloudType>(type: ModelType, index: T) {
   switch (type) {
     case ModelType.GENERA:
@@ -65,4 +45,9 @@ export function getNameFromIndex<T extends CloudType>(type: ModelType, index: T)
     case ModelType.VARIETIES:
       return VarietyCloudMap[index as VarietyCloudType];
   }
+}
+
+export function round(number: number, places = 2) {
+  const multiplier = 10 ** places;
+  return Math.round(number * multiplier) / multiplier;
 }

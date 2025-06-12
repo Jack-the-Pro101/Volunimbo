@@ -1,0 +1,19 @@
+.panel {
+  border: 1px solid var(--clr-neutral-8);
+  padding: 0.5em;
+  border-radius: 0.5rem;
+}
+
+.panel h3 {
+  font-weight: 500;
+}
+
+.list {
+  margin-left: none;
+  margin-top: 0.5em;
+}
+
+.list li {
+  display: flex;
+  justify-content: space-between;
+}

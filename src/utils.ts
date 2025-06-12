@@ -1,4 +1,4 @@
-import { ModelType } from "./src/model/Model.ts";
+import { ModelType } from "./model/Model.ts";
 import {
   CloudType,
   GeneraCloudMap,
@@ -7,7 +7,7 @@ import {
   SpeciesCloudType,
   VarietyCloudMap,
   VarietyCloudType,
-} from "./src/model/ModelTypes.ts";
+} from "./model/ModelTypes.ts";
 
 type TensorflowData = Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>;
 

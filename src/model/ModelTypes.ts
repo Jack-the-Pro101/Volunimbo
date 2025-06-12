@@ -74,7 +74,7 @@ export const GeneraCloudMap: Record<GeneraCloudType, string> = {
   [GeneraCloudType.Ns]: "nimbostratus",
   [GeneraCloudType.Sc]: "stratocumulus",
   [GeneraCloudType.St]: "stratus",
-  [GeneraCloudType.Clear]: "clear",
+  [GeneraCloudType.Clear]: "clear sky",
 } as const;
 
 export const SpeciesCloudMap: Record<SpeciesCloudType, string> = {

@@ -3,7 +3,7 @@ import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show }
 import { createStore } from "solid-js/store";
 
 import { CloudClassification } from "../types.d.ts";
-import { compileResults, getNameFromIndex } from "../utils.ts";
+import { compileResults, getNameFromIndex } from "./utils.ts";
 
 import styles from "./App.module.css";
 
@@ -78,9 +78,14 @@ function App() {
         if (
           (results[0].index as GeneraCloudType) == GeneraCloudType.Clear ||
           (results[0].index as GeneraCloudType) == GeneraCloudType.Ct
-        )
+        ) {
           // Clear sky and contrail clouds do not have additional features, done classifying
+          setCloud("species", "name", null);
+          setCloud("species", "probabilities", []);
+          setCloud("varieties", "name", undefined);
+          setCloud("varieties", "probabilities", []);
           return;
+        }
       } else {
         setCloud("genera", "name", undefined);
       }
@@ -89,7 +94,7 @@ function App() {
         const data = await speciesResult.data();
         const results = compileResults(ModelType.SPECIES, data);
 
-        setCloud("species", "name", results[0].name);
+        setCloud("species", "name", results[0].probability > 0.6 ? results[0].name : null);
         setCloud("species", "probabilities", results);
       } else {
         setCloud("species", "name", undefined);
@@ -103,7 +108,7 @@ function App() {
           "varieties",
           "name",
           results
-            .filter((result) => result.probability >= 0.75)
+            .filter((result) => result.probability >= 0.7)
             .map((result) => getNameFromIndex(ModelType.VARIETIES, result.index))
             .join(" ")
         );

@@ -19,9 +19,9 @@ class Model {
   async init() {
     // Download and load models from static directory
     [this.generaModel, this.speciesModel, this.varietiesModel] = await Promise.all([
-      tf.loadGraphModel("./tfjs/genera/model.json"),
-      tf.loadGraphModel("./tfjs/species/model.json"),
-      tf.loadGraphModel("./tfjs/varieties/model.json"),
+      tf.loadGraphModel(`${import.meta.env.BASE_URL}tfjs/genera/model.json`),
+      tf.loadGraphModel(`${import.meta.env.BASE_URL}tfjs/species/model.json`),
+      tf.loadGraphModel(`${import.meta.env.BASE_URL}tfjs/varieties/model.json`),
     ]);
 
     // Warm up models by passing blank data, allowing resources to be allocated beforehand

@@ -1,4 +1,3 @@
-import { Tensor } from "@tensorflow/tfjs";
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 

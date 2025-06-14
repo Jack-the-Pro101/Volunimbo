@@ -31,4 +31,19 @@
   display: flex;
   justify-content: flex-end;
   margin-top: auto;
+  gap: 0.5em;
+}
+
+.buttons button {
+  border-radius: 100vmax;
+  font-size: 1.2rem;
+}
+
+.buttons button[data-done] {
+  background-color: var(--clr-primary-5);
+  color: white;
+}
+.buttons button[data-done]:hover,
+.buttons button[data-done]:focus {
+  background-color: var(--clr-primary-4);
 }

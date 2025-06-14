@@ -12,8 +12,8 @@ import CloudDetailPanel from "./components/CloudDetailPanel.tsx";
 import Cropper from "./components/Cropper.tsx";
 import Footer from "./components/Footer.tsx";
 import { CNN_INPUT_SIZE } from "./constants.ts";
-import Model, { ModelType } from "./model/Model.ts";
-import { GeneraCloudType } from "./model/ModelTypes.ts";
+import Model from "./model/Model.ts";
+import { GeneraCloudType, ModelType } from "./model/ModelTypes.ts";
 import Loader from "./components/Loader.tsx";
 
 function App() {
@@ -33,9 +33,11 @@ function App() {
     species: { name: undefined, probabilities: [] },
     varieties: { name: undefined, probabilities: [] },
   });
+  const [busy, setBusy] = createSignal(false);
+  const canPredict = () => Model.ready() && !busy();
 
-  onMount(async () => {
-    await Model.init();
+  onMount(() => {
+    Model.init();
 
     imageElem.addEventListener("load", updateImageLoaded);
   });
@@ -56,9 +58,9 @@ function App() {
   }
 
   createEffect(async () => {
-    const imageSrc = image();
-    if (imageSrc == null || !imageLoaded()) return;
+    if (image() == null || !imageLoaded()) return;
 
+    setBusy(true);
     try {
       const imageData = await Model.imageToTensor(imageElem);
 
@@ -68,9 +70,8 @@ function App() {
         Model.predict(ModelType.VARIETIES, imageData),
       ]);
 
-      if (generaResult instanceof Tensor) {
-        const data = await generaResult.data();
-        const results = compileResults(ModelType.GENERA, data);
+      if (generaResult) {
+        const results = compileResults(ModelType.GENERA, generaResult);
 
         setCloud("genera", "name", results[0].name);
         setCloud("genera", "probabilities", results);
@@ -90,9 +91,8 @@ function App() {
         setCloud("genera", "name", undefined);
       }
 
-      if (speciesResult instanceof Tensor) {
-        const data = await speciesResult.data();
-        const results = compileResults(ModelType.SPECIES, data);
+      if (speciesResult) {
+        const results = compileResults(ModelType.SPECIES, speciesResult);
 
         setCloud("species", "name", results[0].probability > 0.6 ? results[0].name : null);
         setCloud("species", "probabilities", results);
@@ -100,18 +100,13 @@ function App() {
         setCloud("species", "name", undefined);
       }
 
-      if (varietiesResult instanceof Tensor) {
-        const data = await varietiesResult.data();
-        const results = compileResults(ModelType.VARIETIES, data);
+      if (varietiesResult) {
+        const results = compileResults(ModelType.VARIETIES, varietiesResult);
+        const confidentResults = results
+          .filter((result) => result.probability >= 0.7)
+          .map((result) => getNameFromIndex(ModelType.VARIETIES, result.index));
 
-        setCloud(
-          "varieties",
-          "name",
-          results
-            .filter((result) => result.probability >= 0.7)
-            .map((result) => getNameFromIndex(ModelType.VARIETIES, result.index))
-            .join(" ")
-        );
+        setCloud("varieties", "name", confidentResults.length > 0 ? confidentResults.join(" ") : null);
         setCloud("varieties", "probabilities", results);
       } else {
         setCloud("varieties", "name", undefined);
@@ -119,6 +114,7 @@ function App() {
     } catch (error) {
       alert(`Failed to predict ${error}`);
     }
+    setBusy(false);
   });
 
   onCleanup(() => {
@@ -183,33 +179,40 @@ function App() {
             </label>
           </form>
           <div class={styles.app}>
-            <Show when={!Model.ready()}>
-              <Loader />
+            <Show
+              when={Model.ready()}
+              fallback={
+                <div class={styles.app__splashscreen}>
+                  <h2>Loading model...</h2>
+                  <Loader />
+                </div>
+              }
+            >
+              <h2 class={styles.app__cloudName}>
+                <Show
+                  when={cloud.genera.name}
+                  fallback={
+                    <For each={[30, 20, 40]}>
+                      {(number) => (
+                        <span class={styles.app__cloudNameSkeleton} style={{ "--width": `${number}%` }}>
+                          {" "}
+                        </span>
+                      )}
+                    </For>
+                  }
+                >
+                  {cloud.genera.name} {cloud.species.name} {cloud.varieties.name}
+                </Show>
+              </h2>
+
+              <p></p>
+
+              <ol class={styles.app__details}>
+                <CloudDetailPanel cloud={cloud.genera} type="Genera" />
+                <CloudDetailPanel cloud={cloud.species} type="Species" />
+                <CloudDetailPanel cloud={cloud.varieties} type="Supplementary features / Varieties" />
+              </ol>
             </Show>
-            <h2 class={styles.app__cloudName}>
-              <Show
-                when={cloud.genera.name}
-                fallback={
-                  <For each={[30, 20, 40]}>
-                    {(number) => (
-                      <span class={styles.app__cloudNameSkeleton} style={{ "--width": `${number}%` }}>
-                        {" "}
-                      </span>
-                    )}
-                  </For>
-                }
-              >
-                {cloud.genera.name} {cloud.species.name} {cloud.varieties.name}
-              </Show>
-            </h2>
-
-            <p></p>
-
-            <ol class={styles.app__details}>
-              <CloudDetailPanel cloud={cloud.genera} type="Genera" />
-              <CloudDetailPanel cloud={cloud.species} type="Species" />
-              <CloudDetailPanel cloud={cloud.varieties} type="Supplementary features / Varieties" />
-            </ol>
           </div>
         </section>
         <AboutSection />

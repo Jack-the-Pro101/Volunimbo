@@ -70,7 +70,20 @@
 
 .app {
   flex-grow: 1;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__splashscreen {
+  border-radius: inherit;
+  background-color: var(--clr-neutral-10);
+  z-index: 9;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
 }
 
 .app__cloudName {
@@ -98,13 +111,7 @@
 .app__details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  align-items: start;
 
   gap: 1em;
-}
-
-footer {
-  min-height: 30vh;
-  padding: 1em;
-  margin-top: 1em;
-  border-top: 1px solid var(--clr-neutral-8);
 }

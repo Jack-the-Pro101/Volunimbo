@@ -20,28 +20,30 @@ export default function CloudDetailPanel<T extends CloudClassification[keyof Clo
         <span>{cloud.name != null ? cloud.name : cloud.name === null ? "None/uncertain" : "-"}</span>
       </p>
 
-      <ol class={styles.list} classList={{ [styles.visible]: showAll() }}>
-        <For each={cloud.probabilities}>
-          {({ name, probability }) => (
-            <li>
-              <span>{name}</span>
-              <span>{round(probability * 100, 4)}%</span>
-            </li>
-          )}
-        </For>
-      </ol>
-      <label for={inputId} class={styles.showLabelBtn}>
-        {!showAll() ? "Show all" : "Hide"}
-      </label>
-      <input
-        type="checkbox"
-        hidden
-        name="show-all"
-        id={inputId}
-        onInput={() => {
-          setShowAll((showing) => !showing);
-        }}
-      />
+      <Show when={cloud.probabilities.length > 0}>
+        <ol class={styles.list} classList={{ [styles.visible]: showAll() }}>
+          <For each={cloud.probabilities}>
+            {({ name, probability }) => (
+              <li>
+                <span>{name}</span>
+                <span>{round(probability * 100, 4)}%</span>
+              </li>
+            )}
+          </For>
+        </ol>
+        <label for={inputId} class={styles.showLabelBtn}>
+          {!showAll() ? "Show all" : "Hide"}
+        </label>
+        <input
+          type="checkbox"
+          hidden
+          name="show-all"
+          id={inputId}
+          onInput={() => {
+            setShowAll((showing) => !showing);
+          }}
+        />
+      </Show>
     </div>
   );
 }

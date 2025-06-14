@@ -29,6 +29,7 @@
   cursor: pointer;
   color: var(--clr-primary-5);
   text-align: center;
+  margin-top: 1em;
 }
 
 .showLabelBtn:hover,
@@ -43,5 +44,6 @@
 .list li {
   display: flex;
   justify-content: space-between;
-  line-height: var(--line-heightd);
+  line-height: var(--line-height);
+  color: var(--clr-neutral-1);
 }

@@ -13,7 +13,9 @@ export interface CloudClassification {
     probabilities: Probability[];
   };
   varieties: {
-    name: string | undefined;
+    name: string | undefined | null;
     probabilities: Probability[];
   };
 }
+
+type TensorflowData = Float32Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike>;

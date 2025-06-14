@@ -1,34 +1,55 @@
 import * as tf from "@tensorflow/tfjs";
 import { Accessor, createSignal, Setter } from "solid-js";
+import {
+  ModelType,
+  WorkerMessageType,
+  WorkerPredictMessage,
+  WorkerPredictResponse,
+  WorkerResponse,
+  WorkerResponseType,
+} from "./ModelTypes.ts";
+import { TensorflowData } from "../../types.d.ts";
 
-export enum ModelType {
-  GENERA, // 10 cloud genera
-  SPECIES, // 15 cloud species
-  VARIETIES, // 30 (only 25 supported) cloud supplementary features/varieties
-}
+type PredictionResolver = (data: TensorflowData) => any;
 
 class Model {
-  private generaModel?: tf.GraphModel;
-  private speciesModel?: tf.GraphModel;
-  private varietiesModel?: tf.GraphModel;
   public ready: Accessor<boolean>;
   private setReady: Setter<boolean>;
+  private worker = new Worker(new URL("./Worker.ts", import.meta.url), { type: "module" });
+
+  private queue: Map<string, PredictionResolver> = new Map();
 
   constructor() {
     [this.ready, this.setReady] = createSignal(false);
+
+    // Begin listening for messages from the worker
+    this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      switch (event.data.type) {
+        case WorkerResponseType.INITIALIZED: {
+          this.setReady(true);
+
+          break;
+        }
+        case WorkerResponseType.PREDICT_RESULT: {
+          const data = event.data as WorkerPredictResponse;
+          const resolver = this.queue.get(data.id)!;
+          resolver(data.result);
+
+          this.queue.delete(data.id);
+
+          break;
+        }
+      }
+    };
   }
 
-  async init() {
+  /**
+   * Initialize the model. Once done, the `Model.ready()` signal will be true.
+   */
+  init() {
     if (this.ready()) return new Error("Already initialized");
 
-    [this.generaModel, this.speciesModel, this.varietiesModel] = await Promise.all([
-      tf.loadGraphModel("/tfjs/genera/model.json"),
-      tf.loadGraphModel("/tfjs/species/model.json"),
-      tf.loadGraphModel("/tfjs/varieties/model.json"),
-    ]);
-
-    this.setReady(true);
-    console.log("Model initialized");
+    this.worker.postMessage({ type: WorkerMessageType.INIT });
   }
 
   async imageToTensor(image: HTMLImageElement) {
@@ -44,16 +65,18 @@ class Model {
   }
 
   async predict(model: ModelType, data: tf.Tensor) {
-    if (!this.ready()) return new Error("Model not initialized");
+    const rawData = await data.data();
 
-    switch (model) {
-      case ModelType.GENERA:
-        return await this.generaModel!.executeAsync(data);
-      case ModelType.SPECIES:
-        return await this.speciesModel!.executeAsync(data);
-      case ModelType.VARIETIES:
-        return await this.varietiesModel!.executeAsync(data);
-    }
+    const resolver = (resolve: PredictionResolver) => {
+      const id = crypto.randomUUID();
+      this.queue.set(id, resolve);
+
+      this.worker.postMessage({ type: WorkerMessageType.PREDICT, id, model, data: rawData } as WorkerPredictMessage);
+    };
+
+    const promise = new Promise(resolver);
+
+    return await promise;
   }
 }
 

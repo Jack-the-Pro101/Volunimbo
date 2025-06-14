@@ -1,3 +1,5 @@
+import { TensorflowData } from "../../types.d.ts";
+
 /**
  * These enums are all ordered based on the AI model's one-hot encoded indices. DO NOT CHANGE THEIR ORDER
  */
@@ -122,3 +124,38 @@ export const VarietyCloudMap: Record<VarietyCloudType, string> = {
   [VarietyCloudType.Vertebratus]: "vertebratus",
   [VarietyCloudType.Virga]: "virga",
 } as const;
+
+export enum ModelType {
+  GENERA, // 10 cloud genera
+  SPECIES, // 15 cloud species
+  VARIETIES, // 30 (only 25 supported) cloud supplementary features/varieties
+}
+
+export enum WorkerMessageType {
+  INIT,
+  PREDICT,
+}
+
+export enum WorkerResponseType {
+  INITIALIZED,
+  PREDICT_RESULT,
+}
+
+export interface WorkerMessage {
+  type: WorkerMessageType;
+}
+
+export interface WorkerResponse {
+  type: WorkerResponseType;
+}
+
+export interface WorkerPredictMessage extends WorkerMessage {
+  id: string;
+  model: ModelType;
+  data: TensorflowData;
+}
+
+export interface WorkerPredictResponse extends WorkerResponse {
+  id: string;
+  result: TensorflowData;
+}

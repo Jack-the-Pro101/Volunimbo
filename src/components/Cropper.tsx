@@ -21,9 +21,9 @@ export default function Cropper({
     cropper = new CropperJs(imageElem, {
       aspectRatio: 1,
       initialAspectRatio: 1,
+      autoCropArea: 1,
       zoomable: false,
       scalable: false,
-      autoCrop: true,
       minCropBoxHeight: CNN_INPUT_SIZE,
       minCropBoxWidth: CNN_INPUT_SIZE,
     });
@@ -38,11 +38,12 @@ export default function Cropper({
           </div>
 
           <div class={styles.buttons}>
-            <button type="button" onClick={callbacks.cancel}>
+            <button type="button" onClick={callbacks.cancel} data-cancel>
               Cancel
             </button>
             <button
               type="button"
+              data-done
               onClick={() => {
                 cropper
                   .getCroppedCanvas({

@@ -156,7 +156,7 @@ function App() {
       <main class={styles.main}>
         <section class={styles.container}>
           <form action="#" class={styles.form}>
-            <label for="cloud" class={styles.form__select}>
+            <label for="cloud" class={styles.form__select} data-selected={image() != null}>
               <img src={image() || ""} alt={file()?.name} class={styles.form__img} />
               <img
                 src={image() || ""}
@@ -166,7 +166,6 @@ function App() {
                 height={CNN_INPUT_SIZE}
                 ref={imageElem}
               />
-              Select image
               <input
                 type="file"
                 hidden

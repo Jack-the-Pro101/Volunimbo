@@ -27,6 +27,8 @@ export default function Cropper({
       // Below is removed for now as this is NOT real image pixel size, rather viewport pixels
       // minCropBoxHeight: CNN_INPUT_SIZE,
       // minCropBoxWidth: CNN_INPUT_SIZE,
+      minCropBoxHeight: 16,
+      minCropBoxWidth: 16,
     });
   });
 
@@ -35,8 +37,13 @@ export default function Cropper({
       <div class={styles.container} ref={container}>
         <div class={styles.content}>
           <div class={styles.imageContainer}>
-            <img src={src()} alt="" ref={imageElem} />
+            <img src={src()} alt="Image preview" ref={imageElem} />
           </div>
+
+          <p>
+            For best results, maximize the area of the crop while trying to ensure that mostly cloud is inside the crop,
+            not trees or ground.
+          </p>
 
           <div class={styles.buttons}>
             <button type="button" onClick={callbacks.cancel} data-cancel>

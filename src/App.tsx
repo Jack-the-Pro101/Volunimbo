@@ -10,7 +10,7 @@ import AboutSection from "./components/AboutSection.tsx";
 import CloudDetailPanel from "./components/CloudDetailPanel.tsx";
 import Cropper from "./components/Cropper.tsx";
 import Footer from "./components/Footer.tsx";
-import { CNN_INPUT_SIZE } from "./constants.ts";
+import { CNN_INPUT_SIZE, VERSION } from "./constants.ts";
 import Model from "./model/Model.ts";
 import { GeneraCloudType, ModelType } from "./model/ModelTypes.ts";
 import Loader from "./components/Loader.tsx";
@@ -150,7 +150,7 @@ function App() {
 
       <header class={styles.header}>
         <h1>Volunimbo</h1>
-        <p>AI cloud type classifier</p>
+        <p>AI cloud type classifier v{VERSION}</p>
       </header>
 
       <main class={styles.main}>

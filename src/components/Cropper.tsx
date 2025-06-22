@@ -24,8 +24,9 @@ export default function Cropper({
       autoCropArea: 1,
       zoomable: false,
       scalable: false,
-      minCropBoxHeight: CNN_INPUT_SIZE,
-      minCropBoxWidth: CNN_INPUT_SIZE,
+      // Below is removed for now as this is NOT real image pixel size, rather viewport pixels
+      // minCropBoxHeight: CNN_INPUT_SIZE,
+      // minCropBoxWidth: CNN_INPUT_SIZE,
     });
   });
 

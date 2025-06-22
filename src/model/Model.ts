@@ -64,6 +64,12 @@ class Model {
     return tensor.div(255).sub(mean).div(std).expandDims(0);
   }
 
+  /**
+   * Run the model on an image
+   * @param model Which model to use (genera, species, or supplementary)
+   * @param data The model data as a Tensorflow tensor
+   * @returns The result as a one-hot encoded array of probabilities
+   */
   async predict(model: ModelType, data: tf.Tensor) {
     const rawData = await data.data();
 

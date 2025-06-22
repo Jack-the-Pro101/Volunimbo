@@ -57,7 +57,7 @@ function App() {
   }
 
   createEffect(async () => {
-    if (image() == null || !imageLoaded()) return;
+    if (image() == null || !imageLoaded() || !Model.ready()) return;
 
     setBusy(true);
     try {
@@ -147,10 +147,12 @@ function App() {
           </Show>
         )}
       </Show>
+
       <header class={styles.header}>
         <h1>Volunimbo</h1>
         <p>AI cloud type classifier</p>
       </header>
+
       <main class={styles.main}>
         <section class={styles.container}>
           <form action="#" class={styles.form}>
@@ -191,7 +193,7 @@ function App() {
                 <Show
                   when={cloud.genera.name}
                   fallback={
-                    <For each={[30, 20, 40]}>
+                    <For each={[20, 15, 30]}>
                       {(number) => (
                         <span class={styles.app__cloudNameSkeleton} style={{ "--width": `${number}%` }}>
                           {" "}
@@ -214,9 +216,11 @@ function App() {
             </Show>
           </div>
         </section>
+
         <AboutSection />
-        <Footer />
       </main>
+
+      <Footer />
     </>
   );
 }

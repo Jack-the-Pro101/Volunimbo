@@ -135,3 +135,9 @@ body {
 
 @media (prefers-color-scheme: light) {
 }
+
+@media screen AND (max-width: 450px) {
+  :root {
+    font-size: 12px;
+  }
+}

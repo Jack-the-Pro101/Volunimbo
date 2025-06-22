@@ -18,23 +18,26 @@
 }
 
 .container {
+  --padding: 1em;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
   max-width: 1400px;
   margin: auto;
-  padding: 1em;
-  gap: 1em;
+  padding: var(--padding);
+  gap: 1.5em;
   border: 1px solid var(--clr-neutral-6);
   border-radius: 1rem;
 }
 
 .form {
-  padding-right: 1em;
+  --preview-resolution: 384px;
+
   display: grid;
   grid-template: 1fr;
-  max-width: calc(384px + 1em);
+  max-width: var(--preview-resolution);
   width: 50%;
 }
 
@@ -42,10 +45,9 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  aspect-ratio: 1 / 1;
-  border-radius: calc(1em - 0.5em);
+  border-radius: calc(var(--padding) - 0.5em);
   width: 100%;
-  max-width: 384px;
+  height: var(--preview-resolution);
   position: sticky;
   top: 0.5em;
 }

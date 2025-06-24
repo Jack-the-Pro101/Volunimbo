@@ -1,6 +1,6 @@
 # Volunimbo
 
-AI cloud type classifier.
+AI cloud type classifier. Web app at https://jack-the-pro101.github.io/Volunimbo/
 
 ![Screenshot](./.github/screenshots/Main_app.png)
 

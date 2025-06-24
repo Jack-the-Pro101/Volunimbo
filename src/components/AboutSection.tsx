@@ -8,7 +8,7 @@ export default function AboutSection() {
       <p>
         A custom built cloud classifier trained with Keras that runs locally in-browser using Tensorflow JS. The
         application is built on 3 separate models, reflecting cloud nomenclature being formatted as such:{" "}
-        {"<genus> [species] [list of supplementary features and varieties]"}, where names wrapped with {"<>"} is
+        {"<genus> [species] [list of supplementary features and varieties]"}, where names wrapped with {"<>"} are
         required and {"[]"} are optional. Genus and species have mutually exclusive names, whilst supplementary features
         and varieties are not, allowing appending as many names as applicable, apart from one exception (which I have
         not hardcoded to prevent yet).
